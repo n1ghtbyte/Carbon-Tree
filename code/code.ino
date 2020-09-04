@@ -18,8 +18,6 @@ int raw_CO2 = 0;
 // Variable to store the value coming from the analog pin
 int raw_CO = 0;
 
-// --> WHY IS "raw_NO2" FLOAT BUT "raw_CO2" & "raw_CO" INT??? <--
-
 // NO2 Sensor Resistance
 float NO2_R = 0;
 // NO2 ppb value
@@ -42,7 +40,7 @@ unsigned long screen2Timer = 0;
 // Variable for the time ON third screen
 unsigned long screen3Timer = 0;
 // Variable for time exhibition between screens
-unsigned long interval = 3000;
+unsigned long interval = 4000;
 // Variable to force first screen
 bool secreen1 = true;
 // Variable to force second screen
@@ -57,7 +55,7 @@ void setup()
   // Clean the display before write
   lcd.clear();
   // Message to show
-  lcd.print("Medidor Ambiente");
+  lcd.print("Ambient Meter");
   //time to wait so you can read the message
   delay(interval);
 
@@ -70,6 +68,8 @@ void setup()
   Serial.setTimeout(1500);
   // Print a first message to Serial Monitor
   Serial.println("BEGINNING DATA MEASUREMENTS");
+  Serial.println("");
+  
 }
 
 void loop()
@@ -156,7 +156,7 @@ void loop()
       // Print the previous CO2 messages/results on Serial Monitor
       Serial.print("CO2: ");
       Serial.print(concentration);
-      Serial.println("ppm");
+      Serial.println(" ppm");
     }
 
     // Set the LCD cursor position first column(0) and second line(1)
@@ -171,7 +171,7 @@ void loop()
     // Print the previous CO messages/results on Serial Monitor
     Serial.print("CO: ");
     Serial.print(CO_ppm);
-    Serial.println("ppm");
+    Serial.println(" ppm");
   }
 
   if ((millis() - screen2Timer > interval) && screen2)
@@ -210,7 +210,7 @@ void loop()
     // Print the previous PM2.5 messages/results on Serial Monitor
     Serial.print("PM2.5: ");
     Serial.print(PM2_5Value);
-    Serial.println("  ug/m3");
+    Serial.println(" ug/m3");
   }
 
   if ((millis() - screen3Timer > interval) && screen3)
