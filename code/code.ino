@@ -4,6 +4,8 @@
 #define LENG 31
 unsigned char buf[LENG];
 
+double data[6];
+
 // NO2 sensor pin
 int NO2_In = A1;
 // CO sensor pin
@@ -22,6 +24,17 @@ int raw_CO = 0;
 float NO2_R = 0;
 // NO2 ppb value
 float NO2_ppb = 0;
+
+//
+float CO2_ppm = 0;
+//
+double CO_ppm = 0;
+//
+double CO2_Volt = 0;
+//
+int voltage_diference = 0;
+//
+float NO2_Volt = 0;
 
 // Define PM1.0 value of the air detector module
 int PM01Value = 0;
@@ -66,9 +79,23 @@ void setup()
   Serial.begin(9600);
   // If it does not start ignore
   Serial.setTimeout(1500);
-  // Print a first message to Serial Monitor
-  Serial.println("BEGINNING DATA MEASUREMENTS");
-  Serial.println("");
+  
+  delay(20000);
+
+  //Serial.println("CO2,CO,PM1.0,PM2.5,PM10,NO2");
+ // Serial.print(",");
+  Serial.print("CO2");
+  Serial.print(",");
+  Serial.print("CO");
+  Serial.print(",");
+  Serial.print("PM1.0");
+  Serial.print(",");
+  Serial.print("PM2.5");
+  Serial.print(",");
+  Serial.print("PM10");
+  Serial.print(",");
+  Serial.println("NO2");
+  
   
 }
 
@@ -77,7 +104,7 @@ void loop()
   // Read the analog in value
   raw_NO2 = analogRead(NO2_In);
   // Conversion formula
-  float NO2_Volt = raw_NO2 / 409.2;
+   NO2_Volt = raw_NO2 / 409.2;
   // Find sensor resistance from No2_Volt, using 5V input & 22kOhm load resistor
   NO2_R = 22000 / ((5 / NO2_Volt) - 1);
   // Convert Rs to ppb (parts per billion) concentration of NO2
@@ -86,11 +113,11 @@ void loop()
   // Read the analog in value
   raw_CO2 = analogRead(CO2_In);
   // Conversion formula
-  double CO2_Volt = raw_CO2 * (5000 / 1024.0);
+   CO2_Volt = raw_CO2 * (5000 / 1024.0);
   // Read the analog in value
   raw_CO = analogRead(CO_In);
   // Conversion formula
-  double CO_ppm = 3.027 * exp(1.0698 * (raw_CO * (5.0 / 1024)));
+  CO_ppm = 3.027 * exp(1.0698 * (raw_CO * (5.0 / 1024)));
 
   // Look for the 0x42 in the Serial port
   if (Serial.find(0x42))
@@ -123,55 +150,12 @@ void loop()
     screen2 = true;
     screen3 = false;
 
-    if (CO2_Volt == 0)
-    {
-      // Message to show
-      lcd.print("CO2: ");
-      // Message to show
-      lcd.print("Fault");
-    }
-
-    if (CO2_Volt < 400)
-    {
-      // Message to show
-      lcd.print("CO2: ");
-      // Message to show
-      lcd.print("preheating");
-    }
-
-    else
-    {
-      int voltage_diference = CO2_Volt - 400;
-
-      // Auxiliar calculation
-      float concentration = voltage_diference * (50.0 / 16.0);
-
-      // Message to show
-      lcd.print("CO2: ");
-      // Print the results to the lcd
-      lcd.print(concentration);
-      // Message to show
-      lcd.print(" ppm");
-
-      // Print the previous CO2 messages/results on Serial Monitor
-      Serial.print("CO2: ");
-      Serial.print(concentration);
-      Serial.println(" ppm");
-    }
-
     // Set the LCD cursor position first column(0) and second line(1)
-    lcd.setCursor(0, 1);
-    // Message to show
-    lcd.print("CO: ");
-    // Print the results to the lcd
-    lcd.print(CO_ppm);
-    // Message to show
-    lcd.print(" ppm");
+    
 
-    // Print the previous CO messages/results on Serial Monitor
-    Serial.print("CO: ");
-    Serial.print(CO_ppm);
-    Serial.println(" ppm");
+    printScreen1();
+    
+    
   }
 
   if ((millis() - screen2Timer > interval) && screen2)
@@ -185,32 +169,8 @@ void loop()
     screen2 = false;
     screen3 = true;
 
-    // Message to show
-    lcd.print("PM1.0: ");
-    // Print the results to the lcd
-    lcd.print(PM01Value);
-    // Message to show
-    lcd.print(" ug/m3");
+    printScreen2();
 
-    // Print the previous PM1.0 messages/results on Serial Monitor
-    Serial.print("PM1.0: ");
-    Serial.print(PM01Value);
-    Serial.println(" ug/m3");
-
-    // Set the LCD cursor position first column(0) and second line(1)
-    lcd.setCursor(0, 1);
-
-    // Message to show
-    lcd.print("PM2.5: ");
-    // Print the results to the lcd
-    lcd.print(PM2_5Value);
-    // Message to show
-    lcd.print(" ug/m3");
-
-    // Print the previous PM2.5 messages/results on Serial Monitor
-    Serial.print("PM2.5: ");
-    Serial.print(PM2_5Value);
-    Serial.println(" ug/m3");
   }
 
   if ((millis() - screen3Timer > interval) && screen3)
@@ -225,39 +185,130 @@ void loop()
     screen2 = false;
     screen3 = false;
 
-    // Message to show
-    lcd.print("PM10: ");
-    // Print the results to the lcd
-    lcd.print(PM10Value);
-    // Message to show
-    lcd.print(" ug/m3");
-
-    // Print the previous PM10 messages/results on Serial Monitor
-    Serial.print("PM10: ");
-    Serial.print(PM10Value);
-    Serial.println(" ug/m3");
-
-    // Set the LCD cursor position first column(0) and second line(1)
-    lcd.setCursor(0, 1);
-    // Message to show
-    lcd.print("NO2: ");
-    // Print the results to the lcd
-    lcd.print(NO2_ppb);
-    // Message to show
-    lcd.print(" ppb");
-
-    // Print the previous NO2 messages/results on Serial Monitor
-    Serial.print("NO2: ");
-    Serial.print(NO2_ppb);
-    Serial.println(" ppb");
-    Serial.println();
-    Serial.println();
+  printScreen3();
+    
   }
 }
 
-void lcdPrint()
-{
+void dataArray(){
+
+}
+
+
+
+void printScreen1(){
+  if (CO2_Volt == 0)
+  {
+    // Message to show
+    lcd.print("CO2: ");
+    // Message to show
+    lcd.print("Fault");
+  }
+
+  if (CO2_Volt < 400)
+  {
+    // Message to show
+    lcd.print("CO2: ");
+    // Message to show
+    lcd.print("preheating");
+  }
+
+  else
+  {
+    voltage_diference = CO2_Volt - 400;
+
+    // Auxiliar calculation
+    CO2_ppm = voltage_diference * (50.0 / 16.0);
+
+
+  lcd.print("CO2: ");
+  lcd.print(CO2_ppm);
+  lcd.print(" ppm");
+
+
   
+  Serial.print(CO2_ppm);
+  Serial.print(",");
+
+
+  }
+
+lcd.setCursor(0, 1);
+  
+  // Message to show
+  lcd.print("CO: ");
+  // Print the results to the lcd
+  lcd.print(CO_ppm);
+  // Message to show
+  lcd.print(" ppm");
+
+  // Print the previous CO messages/results on Serial Monitor
+  
+  Serial.print(CO_ppm);
+   Serial.print(",");
+
+}
+
+void printScreen2(){
+  // Message to show
+  lcd.print("PM1.0: ");
+  // Print the results to the lcd
+  lcd.print(PM01Value);
+  // Message to show
+  lcd.print(" ug/m3");
+
+  // Print the previous PM1.0 messages/results on Serial Monitor
+  
+  Serial.print(PM01Value);
+   Serial.print(",");
+
+  // Set the LCD cursor position first column(0) and second line(1)
+  lcd.setCursor(0, 1);
+
+  // Message to show
+  lcd.print("PM2.5: ");
+  // Print the results to the lcd
+  lcd.print(PM2_5Value);
+  // Message to show
+  lcd.print(" ug/m3");
+
+  // Print the previous PM2.5 messages/results on Serial Monitor
+  
+  Serial.print(PM2_5Value);
+   Serial.print(",");
+ 
+}
+
+void printScreen3()
+{ // Message to show
+  lcd.print("PM10: ");
+  // Print the results to the lcd
+  lcd.print(PM10Value);
+  // Message to show
+  lcd.print(" ug/m3");
+
+  // Print the previous PM10 messages/results on Serial Monitor
+ 
+  Serial.print(PM10Value);
+   Serial.print(",");
+ 
+
+  // Set the LCD cursor position first column(0) and second line(1)
+  lcd.setCursor(0, 1);
+  
+  // Message to show
+  lcd.print("NO2: ");
+  // Print the results to the lcd
+  lcd.print(NO2_ppb);
+  // Message to show
+  lcd.print(" ppb");
+
+  // Print the previous NO2 messages/results on Serial Monitor
+ 
+  Serial.println(NO2_ppb);
+   
+
+ 
 }
 
 // Subroutines for PM2.5 sensor
