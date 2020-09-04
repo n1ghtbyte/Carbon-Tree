@@ -255,6 +255,11 @@ void loop()
   }
 }
 
+void lcdPrint()
+{
+  
+}
+
 // Subroutines for PM2.5 sensor
 char checkValue(unsigned char *thebuf, char leng)
 {
